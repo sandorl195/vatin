@@ -1,17 +1,17 @@
 {
-    "name": "ddeboer/vatin",
+    "name": "sandorl195/vatin",
     "description": "Validate VAT identification numbers",
     "keywords": [ "vat", "tax", "btw", "vies" ],
     "license": "MIT",
     "authors": [
         {
-            "name": "David de Boer",
-            "email": "david@ddeboer.nl",
-            "homepage": "https://github.com/ddeboer"
+            "name": "Sándor László",
+            "email": "sandorl195@gmail.com",
+            "homepage": "https://github.com/sandorl195"
         },
         {
             "name": "Community contributions",
-            "homepage": "https://github.com/ddeboer/vatin/contributors"
+            "homepage": "https://github.com/sandorl195/vatin/contributors"
         }
     ],
     "require": {
