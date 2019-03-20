@@ -20,7 +20,7 @@ class Validator
      * @var array
      * @link http://ec.europa.eu/taxation_customs/vies/faq.html?locale=lt#item_11
      */
-    private $patterns = array(
+    private $patterns = [
         'AT' => 'U[A-Z\d]{8}',
         'BE' => '[0|1]{1}\d{9}',
         'BG' => '\d{9,10}',
@@ -51,7 +51,7 @@ class Validator
         'SE' => '\d{12}',
         'SI' => '\d{8}',
         'SK' => '\d{10}'
-    );
+    ];
 
     /**
      * Client for the VIES web service
@@ -71,41 +71,46 @@ class Validator
     }
 
     /**
-     * Returns true if value is a valid VAT identification number, false
-     * otherwise
-     *
-     * @param string $value          Value
-     * @param bool   $checkExistence In addition to checking the VATIN's format
-     *                               for validity, also check whether the VATIN
-     *                               exists. This requires a call to the VIES
-     *                               web service.
-     *
-     * @return bool
+     *  In addition to checking the VATIN's format
+     *  for validity, also check whether the VATIN
+     *  exists. This requires a call to the VIES
+     *  web service. If it exists, it gives back all
+     *  the necessary data for the company component,
+     *  including its address component.
+     * 
+     * @param string $value 
+     * 
+     * @return array
      */
-    public function isValid($value, $checkExistence = false)
+    public function getClientData($value)
     {
         if (null === $value || '' === $value) {
-            return false;
+            throw new \Exception("Tax ID missing");
         }
 
         $countryCode = substr($value, 0, 2);
         $vatin = substr($value, 2);
 
         if (false === $this->isValidCountryCode($countryCode)) {
-            return false;
+            throw new \Exception("Country code not found");
         }
 
         if (0 === preg_match('/^(?:'.$this->patterns[$countryCode].')$/', $vatin)) {
-            return false;
+            throw new \Exception("Invalid tax ID format");
         }
 
-        if (true === $checkExistence) {
-            $result = $this->getViesClient()->checkVat($countryCode, $vatin);
-
-            return $result->isValid();
+        $vatResponse = $this->getViesClient()->checkVat($countryCode, $vatin); // this is a CheckVatResponse object
+        
+        if (!$vatResponse->isValid()) {
+            throw new \Exception("Tax ID not found");
         }
 
-        return true;
+        $clientData = [
+            "eu_taxid" => $vatResponse->getCountryCode() . $vatResponse->getVatNumber(),
+            "name" => ucwords(strtolower($vatResponse->getName())),
+            "address" => $vatResponse->getCountryCode() . " " . ucwords(strtolower($vatResponse->getAddress()))
+        ];
+        return $clientData;
     }
 
     /**

@@ -58,13 +58,13 @@ class Client
     {
         try {
             return $this->getSoapClient()->checkVat(
-                array(
+                [
                     'countryCode' => $countryCode,
                     'vatNumber' => $vatNumber
-                )
+                ]
             );
         } catch (SoapFault $e) {
-            throw new ViesException('Error communicating with VIES service', 0, $e);
+            throw new ViesException('Error communicating with VIES service', 1, $e);
         }
     }
 
@@ -77,12 +77,12 @@ class Client
     {
         if (null === $this->soapClient) {
             $this->soapClient = new \SoapClient(
-                $this->wsdl,
-                array(
+                $this->wsdl, 
+                [
                     'classmap' => $this->classmap,
                     'user_agent' => 'Mozilla', // the request fails unless a (dummy) user agent is specified
                     'exceptions' => true,
-                )
+                ]
             );
         }
 
